@@ -7,7 +7,7 @@ namespace RtkApp
     {
         
         [DllImport("C:\\Users\\Cliente\\Desktop\\RTKPOST\\Fonte\\src\\postpos.dll", CallingConvention = CallingConvention.Cdecl)]
-        static extern int postpos(gtime_t ts, gtime_t te);
+        static extern int postpos(gtime_t ts, gtime_t te, double ti, double tu);
 
         static void Main(string[] args)
         {
@@ -21,7 +21,7 @@ namespace RtkApp
             te.time = 13;
             te.sec = 346;
 
-            int retorno = postpos(ts, te);
+            int retorno = postpos(ts, te, 347, 348);
 
             Console.WriteLine("\n\n Retorno : " + retorno);
 

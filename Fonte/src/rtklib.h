@@ -1667,7 +1667,7 @@ extern void windupcorr(gtime_t time, const double *rs, const double *rr,
                        double *phw);
 
 /* post-processing positioning -----------------------------------------------*/
-extern int postpos(gtime_t ts, gtime_t te);
+extern int postpos(gtime_t ts, gtime_t te, double ti, double tu);
 
 /* Original extern int postpos(gtime_t ts, gtime_t te, double ti, double tu,
                    const prcopt_t *popt, const solopt_t *sopt,

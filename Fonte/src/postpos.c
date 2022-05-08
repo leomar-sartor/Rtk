@@ -1151,8 +1151,7 @@ static int execses_b(gtime_t ts, gtime_t te, double ti, const prcopt_t *popt,
 *
 *          ssr corrections are valid only for forward estimation.
 *-----------------------------------------------------------------------------*/
-extern int postpos(gtime_t ts, gtime_t te)
-//, gtime_t te, double ti, double tu,
+extern int postpos(gtime_t ts, gtime_t te, double ti, double tu)
 //const prcopt_t *popt, const solopt_t *sopt,
 //const filopt_t *fopt, char **infile, int n, char *outfile,
 //const char *rov, const char *base)
@@ -1169,6 +1168,12 @@ extern int postpos(gtime_t ts, gtime_t te)
     printf("\nTE =>  %lu", te.time);
     printf("\n ---------------------- ");
     printf("\nTE =>  %f", te.sec);
+    printf("\n ---------------------- ");
+
+    printf("\n ---------------------- ");
+    printf("\nTI =>  %f", ti);
+    printf("\n ---------------------- ");
+    printf("\nTU =>  %f", tu);
     printf("\n ---------------------- ");
 
     return 1;
