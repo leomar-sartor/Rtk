@@ -1151,114 +1151,130 @@ static int execses_b(gtime_t ts, gtime_t te, double ti, const prcopt_t *popt,
 *
 *          ssr corrections are valid only for forward estimation.
 *-----------------------------------------------------------------------------*/
-extern int postpos(gtime_t ts, gtime_t te, double ti, double tu,
-                   const prcopt_t *popt, const solopt_t *sopt,
-                   const filopt_t *fopt, char **infile, int n, char *outfile,
-                   const char *rov, const char *base)
+extern int postpos(gtime_t ts, gtime_t te)
+//, gtime_t te, double ti, double tu,
+//const prcopt_t *popt, const solopt_t *sopt,
+//const filopt_t *fopt, char **infile, int n, char *outfile,
+//const char *rov, const char *base)
 {
-    gtime_t tts,tte,ttte;
-    double tunit,tss;
-    int i,j,k,nf,stat=0,week,flag=1,index[MAXINFILE]={0};
-    char *ifile[MAXINFILE],ofile[1024],*ext;
+    printf("\n Dentro de POSTPOS!");
+
+    printf("\n ---------------------- ");
+    printf("\nTS =>  %lu", ts.time);
+    printf("\n ---------------------- ");
+    printf("\nTS =>  %f", ts.sec);
+    printf("\n ---------------------- ");
+
+    printf("\n ---------------------- ");
+    printf("\nTE =>  %lu", te.time);
+    printf("\n ---------------------- ");
+    printf("\nTE =>  %f", te.sec);
+    printf("\n ---------------------- ");
+
+    return 1;
+    // gtime_t tts,tte,ttte;
+    // double tunit,tss;
+    // int i,j,k,nf,stat=0,week,flag=1,index[MAXINFILE]={0};
+    // char *ifile[MAXINFILE],ofile[1024],*ext;
     
-    trace(3,"postpos : ti=%.0f tu=%.0f n=%d outfile=%s\n",ti,tu,n,outfile);
+    // trace(3,"postpos : ti=%.0f tu=%.0f n=%d outfile=%s\n",ti,tu,n,outfile);
     
-    /* open processing session */
-    if (!openses(popt,sopt,fopt,&navs,&pcvss,&pcvsr)) return -1;
+    // /* open processing session */
+    // if (!openses(popt,sopt,fopt,&navs,&pcvss,&pcvsr)) return -1;
     
-    if (ts.time!=0&&te.time!=0&&tu>=0.0) {
-        if (timediff(te,ts)<0.0) {
-            showmsg("error : no period");
-            closeses(&navs,&pcvss,&pcvsr);
-            return 0;
-        }
-        for (i=0;i<MAXINFILE;i++) {
-            if (!(ifile[i]=(char *)malloc(1024))) {
-                for (;i>=0;i--) free(ifile[i]);
-                closeses(&navs,&pcvss,&pcvsr);
-                return -1;
-            }
-        }
-        if (tu==0.0||tu>86400.0*MAXPRCDAYS) tu=86400.0*MAXPRCDAYS;
-        settspan(ts,te);
-        tunit=tu<86400.0?tu:86400.0;
-        tss=tunit*(int)floor(time2gpst(ts,&week)/tunit);
+    // if (ts.time!=0&&te.time!=0&&tu>=0.0) {
+    //     if (timediff(te,ts)<0.0) {
+    //         showmsg("error : no period");
+    //         closeses(&navs,&pcvss,&pcvsr);
+    //         return 0;
+    //     }
+    //     for (i=0;i<MAXINFILE;i++) {
+    //         if (!(ifile[i]=(char *)malloc(1024))) {
+    //             for (;i>=0;i--) free(ifile[i]);
+    //             closeses(&navs,&pcvss,&pcvsr);
+    //             return -1;
+    //         }
+    //     }
+    //     if (tu==0.0||tu>86400.0*MAXPRCDAYS) tu=86400.0*MAXPRCDAYS;
+    //     settspan(ts,te);
+    //     tunit=tu<86400.0?tu:86400.0;
+    //     tss=tunit*(int)floor(time2gpst(ts,&week)/tunit);
         
-        for (i=0;;i++) { /* for each periods */
-            tts=gpst2time(week,tss+i*tu);
-            tte=timeadd(tts,tu-DTTOL);
-            if (timediff(tts,te)>0.0) break;
-            if (timediff(tts,ts)<0.0) tts=ts;
-            if (timediff(tte,te)>0.0) tte=te;
+    //     for (i=0;;i++) { /* for each periods */
+    //         tts=gpst2time(week,tss+i*tu);
+    //         tte=timeadd(tts,tu-DTTOL);
+    //         if (timediff(tts,te)>0.0) break;
+    //         if (timediff(tts,ts)<0.0) tts=ts;
+    //         if (timediff(tte,te)>0.0) tte=te;
             
-            strcpy(proc_rov ,"");
-            strcpy(proc_base,"");
-            if (checkbrk("reading    : %s",time_str(tts,0))) {
-                stat=1;
-                break;
-            }
-            for (j=k=nf=0;j<n;j++) {
+    //         strcpy(proc_rov ,"");
+    //         strcpy(proc_base,"");
+    //         if (checkbrk("reading    : %s",time_str(tts,0))) {
+    //             stat=1;
+    //             break;
+    //         }
+    //         for (j=k=nf=0;j<n;j++) {
                 
-                ext=strrchr(infile[j],'.');
+    //             ext=strrchr(infile[j],'.');
                 
-                if (ext&&(!strcmp(ext,".rtcm3")||!strcmp(ext,".RTCM3"))) {
-                    strcpy(ifile[nf++],infile[j]);
-                }
-                else {
-                    /* include next day precise ephemeris or rinex brdc nav */
-                    ttte=tte;
-                    if (ext&&(!strcmp(ext,".sp3")||!strcmp(ext,".SP3")||
-                              !strcmp(ext,".eph")||!strcmp(ext,".EPH"))) {
-                        ttte=timeadd(ttte,3600.0);
-                    }
-                    else if (strstr(infile[j],"brdc")) {
-                        ttte=timeadd(ttte,7200.0);
-                    }
-                    nf+=reppaths(infile[j],ifile+nf,MAXINFILE-nf,tts,ttte,"","");
-                }
-                while (k<nf) index[k++]=j;
+    //             if (ext&&(!strcmp(ext,".rtcm3")||!strcmp(ext,".RTCM3"))) {
+    //                 strcpy(ifile[nf++],infile[j]);
+    //             }
+    //             else {
+    //                 /* include next day precise ephemeris or rinex brdc nav */
+    //                 ttte=tte;
+    //                 if (ext&&(!strcmp(ext,".sp3")||!strcmp(ext,".SP3")||
+    //                           !strcmp(ext,".eph")||!strcmp(ext,".EPH"))) {
+    //                     ttte=timeadd(ttte,3600.0);
+    //                 }
+    //                 else if (strstr(infile[j],"brdc")) {
+    //                     ttte=timeadd(ttte,7200.0);
+    //                 }
+    //                 nf+=reppaths(infile[j],ifile+nf,MAXINFILE-nf,tts,ttte,"","");
+    //             }
+    //             while (k<nf) index[k++]=j;
                 
-                if (nf>=MAXINFILE) {
-                    trace(2,"too many input files. trancated\n");
-                    break;
-                }
-            }
-            if (!reppath(outfile,ofile,tts,"","")&&i>0) flag=0;
+    //             if (nf>=MAXINFILE) {
+    //                 trace(2,"too many input files. trancated\n");
+    //                 break;
+    //             }
+    //         }
+    //         if (!reppath(outfile,ofile,tts,"","")&&i>0) flag=0;
             
-            /* execute processing session */
-            stat=execses_b(tts,tte,ti,popt,sopt,fopt,flag,ifile,index,nf,ofile,
-                           rov,base);
+    //         /* execute processing session */
+    //         stat=execses_b(tts,tte,ti,popt,sopt,fopt,flag,ifile,index,nf,ofile,
+    //                        rov,base);
             
-            if (stat==1) break;
-        }
-        for (i=0;i<MAXINFILE;i++) free(ifile[i]);
-    }
-    else if (ts.time!=0) {
-        for (i=0;i<n&&i<MAXINFILE;i++) {
-            if (!(ifile[i]=(char *)malloc(1024))) {
-                for (;i>=0;i--) free(ifile[i]);
-                return -1;
-            }
-            reppath(infile[i],ifile[i],ts,"","");
-            index[i]=i;
-        }
-        reppath(outfile,ofile,ts,"","");
+    //         if (stat==1) break;
+    //     }
+    //     for (i=0;i<MAXINFILE;i++) free(ifile[i]);
+    // }
+    // else if (ts.time!=0) {
+    //     for (i=0;i<n&&i<MAXINFILE;i++) {
+    //         if (!(ifile[i]=(char *)malloc(1024))) {
+    //             for (;i>=0;i--) free(ifile[i]);
+    //             return -1;
+    //         }
+    //         reppath(infile[i],ifile[i],ts,"","");
+    //         index[i]=i;
+    //     }
+    //     reppath(outfile,ofile,ts,"","");
         
-        /* execute processing session */
-        stat=execses_b(ts,te,ti,popt,sopt,fopt,1,ifile,index,n,ofile,rov,
-                       base);
+    //     /* execute processing session */
+    //     stat=execses_b(ts,te,ti,popt,sopt,fopt,1,ifile,index,n,ofile,rov,
+    //                    base);
         
-        for (i=0;i<n&&i<MAXINFILE;i++) free(ifile[i]);
-    }
-    else {
-        for (i=0;i<n;i++) index[i]=i;
+    //     for (i=0;i<n&&i<MAXINFILE;i++) free(ifile[i]);
+    // }
+    // else {
+    //     for (i=0;i<n;i++) index[i]=i;
         
-        /* execute processing session */
-        stat=execses_b(ts,te,ti,popt,sopt,fopt,1,infile,index,n,outfile,rov,
-                       base);
-    }
-    /* close processing session */
-    closeses(&navs,&pcvss,&pcvsr);
+    //     /* execute processing session */
+    //     stat=execses_b(ts,te,ti,popt,sopt,fopt,1,infile,index,n,outfile,rov,
+    //                    base);
+    // }
+    // /* close processing session */
+    // closeses(&navs,&pcvss,&pcvsr);
     
-    return stat;
+    //return stat;
 }
