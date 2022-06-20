@@ -15,6 +15,7 @@ using namespace std;
 #endif 
 
 /* constants -----------------------------------------------------------------*/
+#define NFREQ       3                   /* number of carrier frequencies */
 
 /* type definitions ----------------------------------------------------------*/
 typedef struct {
@@ -23,6 +24,16 @@ typedef struct {
     time_t time; 
     double sec;
 } estrutura_t;
+
+typedef struct {           /* SNR mask type */
+    int ena[2];            /* enable flag {rover,base} */
+    double mask[NFREQ][9]; /* mask (dBHz) at 5,10,...85 deg */
+} snrmask_t;
+
+typedef struct {
+    int mode;
+    snrmask_t snrmask;
+} prcopt_t;
 
 #ifdef BUILD_MY_DLL
     #define SHARED_LIB_RTK __declspec(dllexport)
@@ -33,6 +44,8 @@ typedef struct {
 extern int SHARED_LIB_RTK Somar(int num1, int num2);
 extern void ShowMessage();
 extern void SHARED_LIB_RTK MostrarEstrutura(estrutura_t est);
+extern int SHARED_LIB_RTK MostrarEstruturaComArray(snrmask_t snrmask);
+extern int SHARED_LIB_RTK MostrarEstruturaDentroDeEstruturaPorPonteiro(const prcopt_t *popt);
 
 #ifdef __cplusplus
     }

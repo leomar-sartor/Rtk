@@ -1151,39 +1151,52 @@ static int execses_b(gtime_t ts, gtime_t te, double ti, const prcopt_t *popt,
 *
 *          ssr corrections are valid only for forward estimation.
 *-----------------------------------------------------------------------------*/
-extern int postpos(gtime_t ts, gtime_t te, double ti, double tu)
-//const prcopt_t *popt, const solopt_t *sopt,
-//const filopt_t *fopt, char **infile, int n, char *outfile,
-//const char *rov, const char *base)
+extern int postpos(gtime_t ts, gtime_t te, double ti, double tu,
+ int n, char *outfile, const char *rov, const char *base)
+//const prcopt_t *popt, const solopt_t *sopt, const filopt_t *fopt, char **infile, 
 {
     printf("\n Dentro de POSTPOS!");
 
     printf("\n ---------------------- ");
-    printf("\nTS =>  %lu", ts.time);
+    printf("\nTimeStart =>  %lu", ts.time);
     printf("\n ---------------------- ");
     printf("\nTS =>  %f", ts.sec);
     printf("\n ---------------------- ");
 
     printf("\n ---------------------- ");
-    printf("\nTE =>  %lu", te.time);
+    printf("\nTimeEnd =>  %lu", te.time);
     printf("\n ---------------------- ");
     printf("\nTE =>  %f", te.sec);
     printf("\n ---------------------- ");
 
     printf("\n ---------------------- ");
-    printf("\nTI =>  %f", ti);
+    printf("\nTI (Interval) =>  %f", ti);
     printf("\n ---------------------- ");
-    printf("\nTU =>  %f", tu);
+    printf("\nTU (Unit) =>  %f", tu);
     printf("\n ---------------------- ");
 
+    printf("\n N => %d", n);
+    printf("\n ---------------------- ");
+
+    printf("\nOutPutFile => %s", outfile);
+    printf("\n ---------------------- ");
+
+    printf("\nRover => %s", rov);
+    printf("\n ---------------------- ");
+
+    printf("\nBase => %s", base);
+    printf("\n ---------------------- ");
+
+    
+    gtime_t tts,tte,ttte;
+    double tunit,tss;
+    int i,j,k,nf,stat=0,week,flag=1,index[MAXINFILE]={0};
+    char *ifile[MAXINFILE],ofile[1024],*ext;
+    
+    trace(3,"postpos : ti=%.0f tu=%.0f n=%d outfile=%s\n",ti,tu,n,outfile);
+    
     return 1;
-    // gtime_t tts,tte,ttte;
-    // double tunit,tss;
-    // int i,j,k,nf,stat=0,week,flag=1,index[MAXINFILE]={0};
-    // char *ifile[MAXINFILE],ofile[1024],*ext;
-    
-    // trace(3,"postpos : ti=%.0f tu=%.0f n=%d outfile=%s\n",ti,tu,n,outfile);
-    
+
     // /* open processing session */
     // if (!openses(popt,sopt,fopt,&navs,&pcvss,&pcvsr)) return -1;
     
